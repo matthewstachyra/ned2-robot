@@ -1,0 +1,22 @@
+FROM osrf/ros:melodic-desktop-full
+
+COPY /ned_ros /ned_ros
+RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
+RUN apt-get update -q && \
+    apt-get upgrade -yq && \
+    apt-get install -yq xauth && \
+    apt-get install -yq wget curl git vim sudo && \
+    apt-get install -yq ros-melodic-moveit && \
+    apt-get install -y ros-melodic-rosbridge-server
+
+# Install mesa utils for glxinfo
+RUN apt-get install -y mesa-utils
+
+# Install mesa 21.x+
+RUN apt-get -y install software-properties-common
+RUN add-apt-repository -y ppa:kisak/kisak-mesa
+RUN apt-get update
+RUN apt-get -y upgrade
+
+RUN useradd -ms /bin/bash container # creates new user with new home directory (the -m option)
+USER container

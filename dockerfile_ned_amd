@@ -1,0 +1,26 @@
+FROM base-amd:latest
+
+# Change the default shell to Bash
+SHELL [ "/bin/bash" , "-c" ]
+
+USER root
+
+# Create a Catkin workspace and clone TurtleBot3 repos
+RUN source /opt/ros/melodic/setup.bash \
+ && mkdir -p /ned2/src \
+ && cd /ned2/src \
+ && catkin_init_workspace
+
+COPY /ned_ros /ned2/src/
+
+RUN chown container /ned2
+USER container
+ 
+# Build the Catkin workspace and ensure it's sourced
+RUN source /opt/ros/melodic/setup.bash \
+ && cd ned2 \
+ && catkin_make
+RUN echo "source /ned2/devel/setup.bash" >> ~/.bashrc
+ 
+# Set the working folder at startup
+WORKDIR /ned2
